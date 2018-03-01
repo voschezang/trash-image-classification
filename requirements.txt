@@ -1,0 +1,10 @@
+scipy
+numpy
+keras
+tensorflow
+sklearn
+scikit-image
+matplotlib
+pandas
+texttable
+snakeviz
