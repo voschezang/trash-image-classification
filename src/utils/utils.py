@@ -1,10 +1,25 @@
-"""
-Utilities for data processing
+""" Utilities
+e.g. for data analysis + processing
 """
 import os, sys, time, datetime, texttable, copy, random
 import numpy as np, statistics, collections
 from scipy import stats
-import config
+
+### ------------------------------------------------------
+### NEW
+### ------------------------------------------------------
+
+
+def random_img(example_img):
+    # generate a random image with the shape and datatype of the original image
+    return np.empty_like(example_img)
+
+
+### ------------------------------------------------------
+### OUD
+### ------------------------------------------------------
+
+# import config
 
 
 def time_function(f, arg):
