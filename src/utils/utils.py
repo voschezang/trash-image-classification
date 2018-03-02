@@ -5,14 +5,45 @@ import os, sys, time, datetime, texttable, copy, random
 import numpy as np, statistics, collections
 from scipy import stats
 
+
+# (unused)
+class Dataset:
+    def __init__(self, dataset_dir, label_name='breed'):
+        """ dataset_dir must have the following structure
+        dataset_dir/
+          labels.csv
+          train/
+            (images)
+          test/
+            (images)
+        """
+        self.label_name = label_name
+        self.labels = pandas.read_csv(dataset_dir + 'labels.csv')
+        self.train_img_list = os.listdir(dataset_dir + 'train/')
+        self.test_img_list = os.listdir(dataset_dir + 'test/')
+
+        # create a label dicts to convert labels to numerical data and vice versa
+        # the order is arbitrary, as long as we can convert them back to the original classnames
+        unique_labels = set(self.labels[self.label_name])
+        self.n_unique_labels = len(unique_labels)
+        self.label_to_index = utils.dict_value_to_index(unique_labels)
+        self.index_to_label = utils.dict_value_to_index(unique_labels)
+
+        def label_to_index(label='doberman'):
+            return self.label_to_index[label]
+
+        def index_to_label(index):
+            return self.index_label[index]
+
+
 ### ------------------------------------------------------
-### NEW
+### Functions
 ### ------------------------------------------------------
 
 
-def random_img(example_img):
-    # generate a random image with the shape and datatype of the original image
-    return np.empty_like(example_img)
+def stem(filename='aed285c5eae61e3e7ddb5f78e6a7a977.jpg'):
+    # rmv file extension (.jpg)
+    return filename.split('.')[0]
 
 
 ### ------------------------------------------------------
