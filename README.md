@@ -13,6 +13,8 @@ This repo does not include the dataset itself. Download the dataset from an exte
 (The project should have the following structure)
 ```
 dog-breed-identification/
+  src/
+    (jupyter notebooks)
   datasets/
     labels.csv
     train/
