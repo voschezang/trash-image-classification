@@ -1,5 +1,5 @@
 start:
-	jupyter notebook
+	jupyter notebook src/
 
 start_:
 	python3 src/main.py

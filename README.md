@@ -28,5 +28,5 @@ dog-breed-identification/
 
 Run from the command line with
 ```
-jupyter notebook
+make
 ```
