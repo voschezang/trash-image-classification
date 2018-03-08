@@ -23,6 +23,7 @@ This repo does not include the dataset itself. Download the dataset from an exte
 dog-breed-identification/
   src/
     (jupyter notebooks)
+    (some python scripts)
   datasets/
     labels.csv
     train/
