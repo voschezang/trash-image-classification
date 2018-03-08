@@ -11,7 +11,18 @@ from utils import utils
 
 # from utils import utils # custom functions, in local environment
 
-Dataset = namedtuple('Dataset', ['train', 'test', 'labels'])
+Dataset = namedtuple(
+    'Dataset',
+    ['train', 'test', 'labels', 'dict_index_to_label', 'dict_label_to_index'])
+
+print(""" Dataset :: namedtuple(
+    ['train'
+    , 'test'
+    , 'labels'
+    , 'dict_index_to_label'
+    , 'dict_label_to_index'
+    ])
+    """)
 
 
 def init_dataset():
@@ -19,7 +30,15 @@ def init_dataset():
     labels = pandas.read_csv(config.dataset_dir + 'labels.csv')
     train = os.listdir(config.dataset_dir + 'train/')
     test = os.listdir(config.dataset_dir + 'test/')
-    return Dataset(train, test, labels)
+
+    # create a label dicts to convert labels to numerical data and vice versa
+    # the order is arbitrary, as long as we can convert them back to the original classnames
+    unique_labels = set(labels['breed'])
+    dict_index_to_label_ = dict_index_to_label(unique_labels)
+    dict_label_to_index_ = dict_label_to_index(unique_labels)
+    # return data as a namedtuple
+    return Dataset(train, test, labels, dict_index_to_label_,
+                   dict_label_to_index_)
 
 
 def dict_index_to_label(labels):
@@ -44,29 +63,34 @@ def filename_to_class(labels, filename='aed285c5eae61e3e7ddb5f78e6a7a977.jpg'):
     return label.breed.item()
 
 
-def read_img(folder='train', img_name='aed285c5eae61e3e7ddb5f78e6a7a977.jpg'):
+def read_img(folder='train',
+             img_name='aed285c5eae61e3e7ddb5f78e6a7a977.jpg',
+             verbose=False):
     if not folder[-1] == '/':
         folder += '/'
     filename = config.dataset_dir + folder + img_name
+    if verbose: print('reading file: ' + filename)
     return skimage.io.imread(filename)
 
 
-# def extract_data(img_list):
-#     print('extract data:',len(img_list))
-#     global labels
-#     global dict_label_to_index
-#     img_data = []
-#     img_labels = []
-#     for img_name in img_list:
-#         img = data.read_img('train/',img_name)
-#         if img.shape == dimensions:
-#             img_data.append(img.flatten())
-#             breed = data.filename_to_class(labels,img_name)
-#             breed_index = dict_label_to_index[breed]
-#             img_labels.append(breed_index)
-# #         else:
-# #             print('dims')
-#     return (img_data, img_labels)
+# Collect test data (+labels)
+# ignore images that have different dimensions
+# extract_data :: Dataset -> Bool -> ([np.array (flattened)], [label])
+def extract_data(dataset, img_list, dimensions, verbose=False):
+    print('extract data:', len(img_list))
+    labels = dataset.labels
+    dict_label_to_index = dataset.dict_label_to_index
+    img_data = []
+    img_labels = []
+    for img_name in img_list:
+        img = read_img('train/', img_name, verbose)
+        if img.shape == dimensions:
+            img_data.append(img.flatten())
+            breed = filename_to_class(labels, img_name)
+            breed_index = dict_label_to_index[breed]
+            img_labels.append(breed_index)
+            # else: print('dims')
+    return (img_data, img_labels)
 
 
 def gen_random_img(example_img):
