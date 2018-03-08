@@ -4,8 +4,8 @@ Different approaches to solve this [kaggle](https://www.kaggle.com/c/dog-breed-i
 
 Install dependencies 
 ```
-git clone https://github.com/voschezang/amstelhaege.git
-cd amstelhaege
+git clone https://github.com/voschezang/dog-breed-identification.git
+cd dog-breed-identification
 make install
 ```
 
