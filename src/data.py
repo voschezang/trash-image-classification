@@ -16,12 +16,11 @@ Dataset = namedtuple(
     ['train', 'test', 'labels', 'dict_index_to_label', 'dict_label_to_index'])
 
 print(""" Dataset :: namedtuple(
-    ['train'
-    , 'test'
-    , 'labels'
-    , 'dict_index_to_label'
-    , 'dict_label_to_index'
-    ])
+    ['train' = ['img_name']
+    , 'test' = ['img_name']
+    , 'labels' = pandas.df('img_name','breed')
+    , 'dict_index_to_label' = dict to convert label_index -> label_name
+    , 'dict_label_to_index'= dict to convert label_name -> label_index
     """)
 
 
