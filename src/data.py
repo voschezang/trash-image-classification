@@ -78,7 +78,7 @@ def read_img(folder='train',
     return skimage.io.imread(filename)
 
 
-def crop(img, size=150, verbose=False):
+def crop(img, size=250, verbose=False):
     # I think the smallest img has shape 160x160
     a, b, c = img.shape
     if a < size or b < size:

@@ -13,6 +13,13 @@ from keras.optimizers import SGD, Adam
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Conv2D, MaxPool2D, Dropout, Flatten
 
+from keras.layers import Input, Conv2D, Conv2DTranspose, Dense, Reshape, MaxPooling2D, UpSampling2D, Flatten
+from keras.models import Model
+
+### ------------------------------------------------------
+### keras.Sequential
+### ------------------------------------------------------
+
 
 def sequential(input_shape, output_length):
     model = Sequential()
@@ -44,3 +51,12 @@ def sequential_conv(input_shape, output_length):
         output_length,
         activation='softmax'))  # Last layer: 10 class nodes, with dropout
     return model, model.summary
+
+
+### ------------------------------------------------------
+### keras.Model
+### ------------------------------------------------------
+
+
+def model():
+    pass
