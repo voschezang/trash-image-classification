@@ -126,6 +126,12 @@ def extract_all(dataset, img_list, reshaper=crop, verbose=False):
     return (x_train, y_train, amt)
 
 
+def textlabels_to_numerical(dataset, labels):
+    # transform ['label'] => [index]
+    # (list of text => list of indices)
+    return [dataset.dict_label_to_index[label] for label in labels]
+
+
 def show_info(data):
     print('__ info: __')
     print('length: ', len(data))
