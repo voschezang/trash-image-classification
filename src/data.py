@@ -61,6 +61,7 @@ def get_label(img_name='aed285c5eae61e3e7ddb5f78e6a7a977.jpg', labels=[]):
     return label.breed.item()
 
 
+# TODO rmv this function in svm-notebooks
 def filename_to_class(labels, filename='aed285c5eae61e3e7ddb5f78e6a7a977.jpg'):
     # labels :: pandas.df :: { id: breed }
     # index_dict :: { value: index } :: { breed: int }
@@ -75,6 +76,19 @@ def read_img(folder='train',
     filename = config.dataset_dir + folder + img_name
     if verbose: print('reading file: ' + filename)
     return skimage.io.imread(filename)
+
+
+def crop(img, size=150, verbose=False):
+    # I think the smallest img has shape 160x160
+    a, b, c = img.shape
+    if a < size or b < size:
+        if verbose: print('WARNING, img too small', a, b, 'but size is', size)
+        return (False, img)
+    return (True, img[0:size, 0:size])
+
+
+# def flatten(img):
+#     return np.array(crop(img)).flatten()
 
 
 # Collect test data (+labels)
@@ -95,6 +109,21 @@ def extract_data(dataset, img_list, dimensions, verbose=False):
             img_labels.append(breed_index)
             # else: print('dims')
     return (img_data, img_labels)
+
+
+def extract_all(dataset, img_list, reshaper=crop, verbose=False):
+    print('extract all data:', len(img_list))
+    x_train = []
+    y_train = []
+    for img_name in img_list:
+        img = read_img('train/', img_name, verbose)
+        success, img = reshaper(img, verbose=verbose)
+        if success:
+            x_train.append(img)
+            y_train.append(get_label(img_name, dataset.labels))
+    x_train = np.stack(x_train)
+    amt = x_train.shape[0]
+    return (x_train, y_train, amt)
 
 
 def show_info(data):
