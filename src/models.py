@@ -1,4 +1,7 @@
-## NN libs
+""" NN models
+"""
+
+# import nn libs
 import keras
 from keras import backend as K
 from sklearn.decomposition import PCA
@@ -7,7 +10,7 @@ from keras.layers import Dense, Activation
 from keras.optimizers import SGD, Adam
 
 
-def sequential_model(input_shape, output_length):
+def sequential(input_shape, output_length):
     model = keras.Sequential()
     model.add(Dense(128, input_shape=input_shape))
     model.add(Activation('relu'))  # because relu is awesome
