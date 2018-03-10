@@ -97,6 +97,14 @@ def extract_data(dataset, img_list, dimensions, verbose=False):
     return (img_data, img_labels)
 
 
+def show_info(data):
+    print('__ info: __')
+    print('length: ', len(data))
+    print('type: ', type(data))
+    if type(data) is np.ndarray:
+        print('shape: ', data.shape)
+
+
 def gen_random_img(example_img):
     # generate a random image with the shape and datatype of the original image
     return np.empty_like(example_img)
