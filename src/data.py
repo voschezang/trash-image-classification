@@ -1,7 +1,7 @@
 """ Functions that are specific to our dataset
 """
 import pandas
-import os, sklearn, skimage, pandas, numpy as np
+import os, sklearn, skimage, skimage.io, pandas, numpy as np
 # from sklearn import svm
 # from skimage import data, io, filters
 from collections import namedtuple
@@ -54,12 +54,17 @@ def dict_label_to_index(labels):
     return {k: v for v, k in enumerate(unique_labels)}
 
 
+def get_label(img_name='aed285c5eae61e3e7ddb5f78e6a7a977.jpg', labels=[]):
+    # labels :: pandas.df :: { id: breed }
+    # index_dict :: { value: index } :: { breed: int }
+    label = labels.loc[labels['id'] == utils.stem(img_name)]
+    return label.breed.item()
+
+
 def filename_to_class(labels, filename='aed285c5eae61e3e7ddb5f78e6a7a977.jpg'):
     # labels :: pandas.df :: { id: breed }
     # index_dict :: { value: index } :: { breed: int }
-
-    label = labels.loc[labels['id'] == utils.stem(filename)]
-    return label.breed.item()
+    return get_label(filename, labels)
 
 
 def read_img(folder='train',

@@ -6,7 +6,6 @@ import numpy as np, statistics, collections, pandas
 from scipy import stats
 
 import config
-from utils import utils
 
 
 # (unused)

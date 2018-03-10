@@ -12,7 +12,7 @@ rcParams['font.sans-serif'] = [
 rcParams['font.size'] = 14
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
-import scenarios
+# import scenarios
 from utils import utils, io, plot
 
 # These are the "Tableau 20" colors as RGB.
@@ -29,11 +29,27 @@ for i in range(len(TABLEAU20)):
     TABLEAU20[i] = (r / 255., g / 255., b / 255.)
 
 ### --------------------------------------------------------------------
+### Plot Images
+### --------------------------------------------------------------------
+
+
+def multiple(data):
+    # data :: [matrix]
+    n = len(data)
+    plt.figure(figsize=(12, 12 * n))
+    for i in range(n):
+        ax = plt.subplot(1, n, i + 1)
+        plt.imshow(data[i], cmap='gray')
+        ax.get_xaxis().set_visible(False)
+        ax.get_yaxis().set_visible(False)
+
+
+### --------------------------------------------------------------------
 ### Plot line
 ### --------------------------------------------------------------------
 
 
-def single(data, name='plot', gui=False, plotfolder=False):
+def single_line(data, name='plot', gui=False, plotfolder=False):
     name = name.title()
     fig, ax = plt.subplots()
     plt.plot(data)
@@ -188,5 +204,3 @@ def plot_world(data, gui=False, name="graph", custom_dir=False):
         plt.show()
     else:
         plt.close()
-
-
