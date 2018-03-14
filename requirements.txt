@@ -8,3 +8,4 @@ matplotlib
 pandas
 texttable
 snakeviz
+opencv-python
