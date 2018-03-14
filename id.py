@@ -42,4 +42,64 @@ generate images that activate the nn
 
 
 
+
+-----------------
+
+
+autoencoder
+	Model(encoder -> decoder -> classifier)
+
+
+	Model(classifier)		with input 	x -> y
+
+	(no labels needed)
+	Model(encoder, decoder) 	with input	x -> x
+
+Train just the decoder, feeze encoder
+	Model(decoder) 	with input encode(x) -> x
+
+
+
+
+
+
+Finally:
+	Model(classifier) with input	decode(encode(x)) -> y
+
+
+New model
+	# (freeze the encoder, train a new classifier)
+	# user larger hidden_layer 
+	Model(classifier2) 	with input	encode(x) -> y
+
+
+
+--- Testing (new data)
+
+
+  (no labels needed)
+  (more input)
+  Model(encoder3, decoder3) 	with input	x3 -> x3 and x -> x
+
+
+	train
+	Model(encoder3,classfier3) with input 	x -> y
+
+
+	predict
+	Model(encoder3,classifier3) with input	x3
+
+
+
+
 """
+
+
+
+
+
+
+
+
+
+
