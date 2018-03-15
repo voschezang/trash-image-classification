@@ -1,6 +1,17 @@
 """ Project parameters & config
 """
+import cv2
 
 dataset_dir = '../datasets/'
 
-# params['default] = {}
+raw_img_dir = 'raw'
+train_dir = 'train'
+test_dir = 'test'
+
+plot_results_dir = 'results/'
+
+###
+### Haar files
+###
+
+cascades_dir = '../haarcascades/'
