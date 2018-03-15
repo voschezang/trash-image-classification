@@ -1,6 +1,6 @@
 """
 File with functions to plot results
-
+e.g. barcharts, histograms
 """
 
 import numpy as np
