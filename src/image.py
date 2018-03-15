@@ -49,5 +49,21 @@ def detect_eyes(gray_img, faces=[], min_eyes=2, scale=1.3, nn=1):
     return result
 
 
-# def draw_faces()
-# def draw_eyes()
+def draw_faces(img, faces):
+    img_ = img.copy()
+    for (x, y, w, h) in faces:
+        img_ = cv2.rectangle(img_, (x, y), (x + w, y + h), (255, 0, 0), 2)
+    return img_
+
+
+def draw_eyes(img, eye_dict):
+    # :eye_dict :: {face: eyes} :: {(x,y,w,h): list (x,y,w,h)}
+    img_ = img.copy()
+    # https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_objdetect/py_face_detection/py_face_detection.html#face-detection
+    for (x, y, w, h), eyes in eye_dict:
+        roi_gray = gray[y:y + h, x:x + w]
+        for (ex, ey, ew, eh) in eyes:
+            # (mutable data...)
+            cv2.rectangle(roi_color, (ex, ey), (ex + ew, ey + eh), (0, 255, 0),
+                          2)
+    return img_
