@@ -3,14 +3,13 @@
 import numpy as np
 import sklearn, os, sys
 from sklearn import svm
-from skimage import data, io, filters
-import skimage.io
-import matplotlib.pyplot as plt
-import numpy as np
-import cv2
+# from skimage import filters
+import skimage.io, cv2, PIL
 from PIL import ImageEnhance
+import matplotlib.pyplot as plt
 
 import config
+from utils import utils
 
 # (important)
 #   cv2.imread() and skimage.io.imread() produce different results
@@ -20,48 +19,85 @@ import config
 # ## --------------------------------------------------------------------
 
 
+def to_np_array(PIL_img, mode='RGB'):
+    # convert PIL.Image to np.ndarray
+    return np.array(PIL_img.convert(mode))
+
+
+def to_PIL_Image(img):
+    # convert np.ndarray to PIL.Image
+    return PIL.Image.fromarray(img)
+
+
+def encode_super_img(img, mutate=False):
+    mutation = transform_random(img)
+    rgb = to_np_array(mutation, mode='RGB')
+    img_ = show_edges(mutation.copy())
+    edges = to_np_array(img_, mode='P')
+    # reshape 'edges' to fit 'rgb'
+    edges = edges[:, :, np.newaxis]
+    return np.append(rgb, edges, axis=2)
+
+
+def decode_super_img(img):
+    return img[:, :, :3]
+
+
 def transform_image(img, sharpness=1.5, bw=1.0, contrast=0.8, brightness=1):
     """
     sharpness (factor)
-    - An enhancement factor of 0.0 gives a blurred image,
-    a factor of 1.0 gives the original image,
-      and a factor of 2.0 gives a sharpened image.
-    colf = color factor
-    - An enhancement factor of 0.0 gives a black and white image.
-    A factor of 1.0 gives the original image.
+    - 0.0 gives a blurred image,
+      1.0 gives the original image,
+      2.0 gives a sharpened image.
+    bw = black & white color factor
+    - 0.0 gives a black and white image.
+      1.0 gives the original image.
     conf = contrast factor
-    - An enhancement factor of 0.0 gives a solid grey image.
-    A factor of 1.0 gives the original image.
+    - 0.0 gives a solid grey image.
+     1.0 gives the original image.
     brightness factor
-    - An enhancement factor of 0.0 gives a black image.
-    A factor of 1.0 gives the original image.
+    - 0.0 gives a black image.
+      1.0 gives the original image.
     """
     trans_img = img.copy()
 
     trans_img = ImageEnhance.Contrast(trans_img)
-    trans_img = contrast_.enhance(contrast)
+    trans_img = trans_img.enhance(contrast)
 
     trans_img = ImageEnhance.Sharpness(trans_img)
-    trans_img = sharpness.enhance(sharpness)
+    trans_img = trans_img.enhance(sharpness)
 
     trans_img = ImageEnhance.Color(trans_img)
-    trans_img = color.enhance(bw)
+    trans_img = trans_img.enhance(bw)
 
     trans_img = ImageEnhance.Brightness(trans_img)
-    result_img = brightness.enhance(brightness)
+    result_img = trans_img.enhance(brightness)
 
     return result_img
 
 
-def transform_random(img, amt=1):
-    to_negative = (np.random.random(9) - 0.5) * 2
-    scale = np.random.random(9) * amt
-    mutation_vector = np.random.random(9) * to_negative * scale
+def show_edges(img):
+    return img.filter(PIL.ImageFilter.FIND_EDGES)
 
-    sharpness = mutation_vector[0]
-    contrast = mutation_vector[1]
-    brightness = mutation_vector[2]
-    return transform_image(img, sharpness=1.5, contrast=0.8, brightness=1)
+
+def rotate_img(img, amt):
+    return img.rotate(45)
+
+
+def transform_random(img, scale=[1, 1, 1]):
+    # params are from a skewed distribution
+    # mutation_vector = np.random.random(3) * scale
+    lowest = 0.2
+    highest = 4
+    mutation_vector = [
+        utils.random_skewed(lowest, highest, skew=2) for _ in range(3)
+    ]
+    # mutation_vector = [1, 1, 1] + np.random.random(3) * scale
+
+    s = mutation_vector[0]
+    c = mutation_vector[1]
+    b = mutation_vector[2]
+    return transform_image(img, sharpness=s, contrast=c, brightness=b)
 
 
 ### --------------------------------------------------------------------

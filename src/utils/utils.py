@@ -54,31 +54,43 @@ def stem(filename='aed285c5eae61e3e7ddb5f78e6a7a977.jpg'):
 
 # import config
 
+# def time_function(f, arg):
+#     t = time.time()
+#     results = f(arg)
+#     dt = time.time() - t
+#     print("time was", dt, t, time.time() - t)
+#     return results, dt
 
-def time_function(f, arg):
-    t = time.time()
-    results = f(arg)
-    dt = time.time() - t
-    print("time was", dt, t, time.time() - t)
-    return results, dt
+
+def random_skewed_mirrored(lowest=0, highest=1, skew=1):
+    # a bit like non-central chi-square, but more triangle shaped
+    # e.g.
+    #      _
+    #     / \__
+    #   _/     \_______
+    # -0---1---2---3---4---
+    if np.random.random() > 0.5:
+        return random_skewed(1, highest, skew=2)
+    else:
+        return 1 - random_skewed(lowest, 1, skew=2)
 
 
-def random_skewed(lowest=0, highest=1, skew=1):
+def random_skewed(lowest=0, highest=1, skew=1, n=1):
     # random value from a skewed distribution:
     #   rand^power * max_range
     #   power < 1 -> higher probability for high values
     #   power > 1 -> higher probability for low values
     # random.seed(seed) TODO
     if lowest >= 0:
-        return lowest + random.random()**skew * (highest - lowest)
+        return lowest + random.random(n)**skew * (highest - lowest)
     else:
         # (kind of) symmetric distribution
         if random.random() < 0.5:
             # positive outcome
-            return random.random()**skew * highest
+            return random.random(n)**skew * highest
         else:
             # negative outcome
-            return random.random()**skew * lowest
+            return random.random(n)**skew * lowest
 
 
 def statistical_tests(data={},

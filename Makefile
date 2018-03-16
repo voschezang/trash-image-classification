@@ -1,11 +1,11 @@
 start:
 	jupyter notebook src/
 
-start_:
-	python3 src/main.py
-
 startw:
 	pythonw src/main.py
+
+dev:
+	python3 src/main.py
 
 install:
 	pip3 install -r requirements.txt
