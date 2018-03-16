@@ -8,6 +8,7 @@ import skimage.io
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
+from PIL import ImageEnhance
 
 import config
 
@@ -15,7 +16,56 @@ import config
 #   cv2.imread() and skimage.io.imread() produce different results
 
 ### --------------------------------------------------------------------
-### Pixel transformations
+### Full img transformations
+# ## --------------------------------------------------------------------
+
+
+def transform_image(img, sharpness=1.5, bw=1.0, contrast=0.8, brightness=1):
+    """
+    sharpness (factor)
+    - An enhancement factor of 0.0 gives a blurred image,
+    a factor of 1.0 gives the original image,
+      and a factor of 2.0 gives a sharpened image.
+    colf = color factor
+    - An enhancement factor of 0.0 gives a black and white image.
+    A factor of 1.0 gives the original image.
+    conf = contrast factor
+    - An enhancement factor of 0.0 gives a solid grey image.
+    A factor of 1.0 gives the original image.
+    brightness factor
+    - An enhancement factor of 0.0 gives a black image.
+    A factor of 1.0 gives the original image.
+    """
+    trans_img = img.copy()
+
+    trans_img = ImageEnhance.Contrast(trans_img)
+    trans_img = contrast_.enhance(contrast)
+
+    trans_img = ImageEnhance.Sharpness(trans_img)
+    trans_img = sharpness.enhance(sharpness)
+
+    trans_img = ImageEnhance.Color(trans_img)
+    trans_img = color.enhance(bw)
+
+    trans_img = ImageEnhance.Brightness(trans_img)
+    result_img = brightness.enhance(brightness)
+
+    return result_img
+
+
+def transform_random(img, amt=1):
+    to_negative = (np.random.random(9) - 0.5) * 2
+    scale = np.random.random(9) * amt
+    mutation_vector = np.random.random(9) * to_negative * scale
+
+    sharpness = mutation_vector[0]
+    contrast = mutation_vector[1]
+    brightness = mutation_vector[2]
+    return transform_image(img, sharpness=1.5, contrast=0.8, brightness=1)
+
+
+### --------------------------------------------------------------------
+### Indiviual pixel transformations
 ### --------------------------------------------------------------------
 
 
