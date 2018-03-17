@@ -4,6 +4,9 @@ start:
 startw:
 	pythonw src/main.py
 
+logs:
+	tensorboard --logdir=/tmp/ml_model
+
 dev:
 	python3 src/main.py
 

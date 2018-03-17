@@ -1,6 +1,8 @@
 """ Project parameters & config
 """
-import cv2
+
+tmp_model_dir = '/tmp/ml_model'  # see Makefile/logs
+# http://localhost:6006
 
 dataset_dir = '../datasets/'
 
