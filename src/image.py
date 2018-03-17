@@ -19,6 +19,14 @@ from utils import utils
 # ## --------------------------------------------------------------------
 
 
+def normalize(img=np.array()):
+    return img / 255
+
+
+def denormalize(img=np.array()):
+    return img * 255
+
+
 def to_np_array(PIL_img, mode='RGB'):
     # convert PIL.Image to np.ndarray
     return np.array(PIL_img.convert(mode))
@@ -36,11 +44,12 @@ def encode_super_img(img, mutate=False):
     edges = to_np_array(img_, mode='P')
     # reshape 'edges' to fit 'rgb'
     edges = edges[:, :, np.newaxis]
-    return np.append(rgb, edges, axis=2)
+    encoded = np.append(rgb, edges, axis=2)
+    return normalize(encoded)
 
 
 def decode_super_img(img):
-    return img[:, :, :3]
+    return denormalize(img[:, :, :3])
 
 
 def transform_image(img, sharpness=1.5, bw=1.0, contrast=0.8, brightness=1):
