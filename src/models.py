@@ -33,7 +33,7 @@ def sequential(input_shape, output_length):
     return model, model.summary
 
 
-def sequential_conv(input_shape, output_length):
+def sequential_conv(input_shape, output_length, dropout=0.25):
     model = Sequential()
     model.add(
         Conv2D(
@@ -42,11 +42,11 @@ def sequential_conv(input_shape, output_length):
     model.add(Conv2D(32, (3, 3), activation='relu'))
     model.add(MaxPool2D(pool_size=(2, 2)))
     model.add(
-        Dropout(0.25)
+        Dropout(dropout)
     )  # Dropout 25% of the nodes of the previous layer during training
     model.add(Flatten())  # Flatten, and add a fully connected layer
     model.add(Dense(128, activation='relu'))
-    model.add(Dropout(0.5))
+    model.add(Dropout(dropout))  # 5 TODO minder dropout?
     model.add(Dense(
         output_length,
         activation='softmax'))  # Last layer: 10 class nodes, with dropout

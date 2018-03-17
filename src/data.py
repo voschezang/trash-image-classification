@@ -2,6 +2,7 @@
 """
 import pandas
 import os, sklearn, skimage, skimage.io, pandas, numpy as np
+import keras.utils
 # from sklearn import svm
 # from skimage import data, io, filters
 from collections import namedtuple
@@ -38,6 +39,21 @@ def init_dataset():
     # return data as a namedtuple
     return Dataset(train, test, labels, dict_index_to_label_,
                    dict_label_to_index_)
+
+
+def labels_to_vectors(dataset, train_labels, test_labels):
+    # dataset contains dicts to convert
+    train = textlabels_to_numerical(dataset, train_labels)
+    test = textlabels_to_numerical(dataset, test_labels)
+    y_train = keras.utils.to_categorical(train)
+    y_test = keras.utils.to_categorical(test)
+    return y_train, y_test
+
+
+def textlabels_to_numerical(dataset, labels):
+    # transform ['label'] => [index]
+    # (list of text => list of indices)
+    return [dataset.dict_label_to_index[label] for label in labels]
 
 
 def dict_index_to_label(labels):
@@ -124,12 +140,6 @@ def extract_all(dataset, img_list, reshaper=crop, verbose=False):
     x_train = np.stack(x_train)
     amt = x_train.shape[0]
     return (x_train, y_train, amt)
-
-
-def textlabels_to_numerical(dataset, labels):
-    # transform ['label'] => [index]
-    # (list of text => list of indices)
-    return [dataset.dict_label_to_index[label] for label in labels]
 
 
 def show_info(data):
