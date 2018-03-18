@@ -43,11 +43,21 @@ def init_dataset():
 
 def labels_to_vectors(dataset, train_labels, test_labels):
     # dataset contains dicts to convert
+    # TODO make sure that every label is present in both y_test and y_test
     train = textlabels_to_numerical(dataset, train_labels)
     test = textlabels_to_numerical(dataset, test_labels)
     y_train = keras.utils.to_categorical(train)
     y_test = keras.utils.to_categorical(test)
     return y_train, y_test
+
+
+def y_to_label_dict(dataset, vector=[]):
+    n = vector.shape[0]
+    result = {}  # :: {label: score}
+    for i in range(n):
+        label = dataset.dict_index_to_label[i]
+        result[label] = vector[i]
+    return result
 
 
 def textlabels_to_numerical(dataset, labels):

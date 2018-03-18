@@ -21,10 +21,14 @@ from keras.models import Model
 ### ------------------------------------------------------
 
 
-def sequential(input_shape, output_length):
+def sequential(input_shape, output_length, dropout=0.1):
     model = Sequential()
     model.add(Dense(128, input_shape=input_shape))
     model.add(Activation('relu'))  # because relu is awesome
+    # model.add(
+    #     Dropout(dropout)
+    # )
+    # Dropout 25% of the nodes of the previous layer during training
     # ... more layers
 
     model.add(Dense(output_length))

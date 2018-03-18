@@ -135,6 +135,7 @@ def print_dict(dirname="", d={}, name="text"):
 
 def save_to_csv(dirname, name, data):
     # panda df requires data to be NOT of type {key: scalar}
+    # but rather: {'name':['value']}
     filename = dirname + "/" + name + ".csv"
     df = pandas.DataFrame(data=data)
     df.to_csv(filename, sep=',', index=False)
