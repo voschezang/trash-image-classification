@@ -1,9 +1,20 @@
 """ Functions that transform images (np matrices)
+2 types of image formats are used
+:img, np_img :: np.ndarray (rgb, rgbe)
+:PIL_img :: PIL-compatible image
+
+These can be converted with the functions
+  to_np_array(), to_PIL()
+
+Note that the following functions produce different (incompatible) results
+  skimage.io.imread()      (np.array)
+  PIL.Image.open()
+  cv2.imread()
 """
+
 import numpy as np
 import sklearn, os, sys
 from sklearn import svm
-# from skimage import filters
 import skimage.io, cv2, PIL
 from PIL import ImageEnhance
 import matplotlib.pyplot as plt
@@ -19,37 +30,43 @@ from utils import utils
 # ## --------------------------------------------------------------------
 
 
-def normalize(img=np.array()):
-    return img / 255
-
-
-def denormalize(img=np.array()):
-    return img * 255
-
-
 def to_np_array(PIL_img, mode='RGB'):
     # convert PIL.Image to np.ndarray
     return np.array(PIL_img.convert(mode))
 
 
-def to_PIL_Image(img):
+def to_PIL(np_img):
     # convert np.ndarray to PIL.Image
-    return PIL.Image.fromarray(img)
+    return PIL.Image.fromarray(np_img)
 
 
-def encode_super_img(img, mutate=False):
-    mutation = transform_random(img)
-    rgb = to_np_array(mutation, mode='RGB')
-    img_ = show_edges(mutation.copy())
+def normalize(img=np.array([])):
+    # not lossless
+    return img / 255.
+
+
+def denormalize(img=np.array([])):
+    return img * 255.
+
+
+def encode_img(np_img, mutate=False):
+    # encode img, set mutate to True to make the transformation non-deterministic
+    # returns a np.ndarray
+    PIL_img = to_PIL(np_img)
+    if mutate:
+        PIL_img = transform_random(PIL_img)
+    rgb = to_np_array(PIL_img, mode='RGB')
+    img_ = show_edges(PIL_img.copy())
     edges = to_np_array(img_, mode='P')
     # reshape 'edges' to fit 'rgb'
     edges = edges[:, :, np.newaxis]
     encoded = np.append(rgb, edges, axis=2)
-    return normalize(encoded)
+    return encoded
 
 
-def decode_super_img(img):
-    return denormalize(img[:, :, :3])
+def decode_img(img):
+    # not lossless: rmv the edge-layer
+    return img[:, :, :3]
 
 
 def transform_image(img, sharpness=1.5, bw=1.0, contrast=0.8, brightness=1):
@@ -96,11 +113,12 @@ def rotate_img(img, amt):
 def transform_random(img, scale=[1, 1, 1]):
     # params are from a skewed distribution
     # mutation_vector = np.random.random(3) * scale
-    lowest = 0.2
-    highest = 4
+    lowest = 0.5
+    highest = 2.5
     mutation_vector = [
-        utils.random_skewed(lowest, highest, skew=2) for _ in range(3)
+        utils.random_skewed(lowest, highest, skew=4) for _ in range(3)
     ]
+    # print('m', mutation_vector)
     # mutation_vector = [1, 1, 1] + np.random.random(3) * scale
 
     s = mutation_vector[0]

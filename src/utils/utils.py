@@ -7,37 +7,6 @@ from scipy import stats
 
 import config
 
-
-# (unused)
-class Dataset:
-    def __init__(self, dataset_dir, label_name='breed'):
-        """ dataset_dir must have the following structure
-        dataset_dir/
-          labels.csv
-          train/
-            (images)
-          test/
-            (images)
-        """
-        self.label_name = label_name
-        self.labels = pandas.read_csv(dataset_dir + 'labels.csv')
-        self.train_img_list = os.listdir(dataset_dir + 'train/')
-        self.test_img_list = os.listdir(dataset_dir + 'test/')
-
-        # create a label dicts to convert labels to numerical data and vice versa
-        # the order is arbitrary, as long as we can convert them back to the original classnames
-        unique_labels = set(self.labels[self.label_name])
-        self.n_unique_labels = len(unique_labels)
-        self.label_to_index = utils.dict_value_to_index(unique_labels)
-        self.index_to_label = utils.dict_value_to_index(unique_labels)
-
-        def label_to_index(label='doberman'):
-            return self.label_to_index[label]
-
-        def index_to_label(index):
-            return self.index_label[index]
-
-
 ### ------------------------------------------------------
 ### Functions
 ### ------------------------------------------------------
@@ -46,6 +15,37 @@ class Dataset:
 def stem(filename='aed285c5eae61e3e7ddb5f78e6a7a977.jpg'):
     # rmv file extension (.jpg)
     return filename.split('.')[0]
+
+
+def random_skewed_mirrored(lowest=0, highest=1, skew=1, center=1):
+    # a bit like non-central chi-square, but more triangle shaped
+    # e.g.
+    #      _
+    #     / \__
+    #   _/     \_______
+    # -0---1---2---3---4---
+    if np.random.random() > 0.5:
+        return random_skewed(center, highest, skew)
+    else:
+        return center - random_skewed(lowest, center, skew)
+
+
+def random_skewed(lowest=0, highest=1, skew=1, n=1):
+    # random value from a skewed distribution:
+    #   rand^power * max_range
+    #   power < 1 -> higher probability for high values
+    #   power > 1 -> higher probability for low values
+    # random.seed(seed) TODO
+    if lowest >= 0:
+        return lowest + np.random.random(n)**skew * (highest - lowest)
+    else:
+        # (kind of) symmetric distribution
+        if np.random.random() < 0.5:
+            # positive outcome
+            return np.random.random(n)**skew * highest
+        else:
+            # negative outcome
+            return np.random.random(n)**skew * lowest
 
 
 ### ------------------------------------------------------
@@ -60,37 +60,6 @@ def stem(filename='aed285c5eae61e3e7ddb5f78e6a7a977.jpg'):
 #     dt = time.time() - t
 #     print("time was", dt, t, time.time() - t)
 #     return results, dt
-
-
-def random_skewed_mirrored(lowest=0, highest=1, skew=1):
-    # a bit like non-central chi-square, but more triangle shaped
-    # e.g.
-    #      _
-    #     / \__
-    #   _/     \_______
-    # -0---1---2---3---4---
-    if np.random.random() > 0.5:
-        return random_skewed(1, highest, skew=2)
-    else:
-        return 1 - random_skewed(lowest, 1, skew=2)
-
-
-def random_skewed(lowest=0, highest=1, skew=1, n=1):
-    # random value from a skewed distribution:
-    #   rand^power * max_range
-    #   power < 1 -> higher probability for high values
-    #   power > 1 -> higher probability for low values
-    # random.seed(seed) TODO
-    if lowest >= 0:
-        return lowest + random.random(n)**skew * (highest - lowest)
-    else:
-        # (kind of) symmetric distribution
-        if random.random() < 0.5:
-            # positive outcome
-            return random.random(n)**skew * highest
-        else:
-            # negative outcome
-            return random.random(n)**skew * lowest
 
 
 def statistical_tests(data={},
