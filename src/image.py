@@ -22,9 +22,6 @@ import matplotlib.pyplot as plt
 import config
 from utils import utils
 
-# (important)
-#   cv2.imread() and skimage.io.imread() produce different results
-
 ### --------------------------------------------------------------------
 ### Full img transformations
 # ## --------------------------------------------------------------------
@@ -106,8 +103,8 @@ def show_edges(img):
     return img.filter(PIL.ImageFilter.FIND_EDGES)
 
 
-def rotate_img(img, amt):
-    return img.rotate(45)
+def rotate_img(img, degrees):
+    return img.rotate(degrees)
 
 
 def transform_random(img, scale=[1, 1, 1]):
