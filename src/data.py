@@ -142,6 +142,8 @@ def extract_all(dataset, img_list, reshaper=crop, verbose=False):
     x_train = []
     y_train = []
     for img_name in img_list:
+        if not img_name[-4:] == '.jpg':
+            img_name += '.jpg'
         img = read_img('train/', img_name, verbose)
         success, img = reshaper(img, verbose=verbose)
         if success:
@@ -155,8 +157,8 @@ def extract_all(dataset, img_list, reshaper=crop, verbose=False):
 def items_with_label(labels, label='scottish_deerhound'):
     # return all items with label x
     #:labels :: pandas.DataFrame[item,'label']
-    column = labels.keys()[1]
-    return labels.loc[labels[column] == label]
+    id_col, label_col = labels.keys()[0:2]
+    return labels.loc[labels[label_col] == label][id_col]
 
 
 def top_classes(labels, amt=3):
@@ -164,7 +166,8 @@ def top_classes(labels, amt=3):
     #:labels :: pandas.DataFrame['id','breed']
     counter = collections.Counter(labels['breed'])
     ls = list(counter.items())
-    return sorted(ls, key=lambda x: x[1], reverse=True)[:amt]
+    sorted_list = sorted(ls, key=lambda x: x[1], reverse=True)[:amt]
+    return [label for label, _ in sorted_list]
 
 
 def show_info(data):
