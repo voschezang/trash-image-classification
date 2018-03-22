@@ -152,6 +152,20 @@ def extract_all(dataset, img_list, reshaper=crop, verbose=False):
     return (x_train, y_train, amt)
 
 
+def items_with_label(labels, label='scottish_deerhound'):
+    # return all items with label x
+    #:labels :: pandas.DataFrame[item,'label']
+    return labels.loc[dataset.labels.keys()[1] == label]
+
+
+def top_classes(labels, amt=3):
+    # return classes that have the most instances
+    #:labels :: pandas.DataFrame['id','breed']
+    counter = collections.Counter(dataset.labels['breed'])
+    ls = list(counter.items())
+    return sorted(ls, key=lambda x: x[1], reverse=True)[:amt]
+
+
 def show_info(data):
     print('__ info: __')
     print('length: ', len(data))
