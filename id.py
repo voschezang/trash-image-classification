@@ -1,4 +1,17 @@
 
+keras
+
+metrics - geen accuracy
+
+model.fit() - arg voor hyper param optimization
+
+
+
+
+
+denoising during training?
+denoising autoencoders
+
 
 """
 shuffle existing images

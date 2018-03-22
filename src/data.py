@@ -80,7 +80,8 @@ def dict_label_to_index(labels):
     return {k: v for v, k in enumerate(unique_labels)}
 
 
-def get_label(img_name='aed285c5eae61e3e7ddb5f78e6a7a977.jpg', labels=[]):
+def get_label(img_name='aed285c5eae61e3e7ddb5f78e6a7a977.jpg',
+              labels=pandas.DataFrame()):
     # labels :: pandas.df :: { id: breed }
     # index_dict :: { value: index } :: { breed: int }
     label = labels.loc[labels['id'] == utils.stem(img_name)]
@@ -138,6 +139,7 @@ def extract_data(dataset, img_list, dimensions, verbose=False):
 
 
 def extract_all(dataset, img_list, reshaper=crop, verbose=False):
+    # labels :: df['id','class']
     print('extract all data:', len(img_list))
     x_train = []
     y_train = []
@@ -148,6 +150,8 @@ def extract_all(dataset, img_list, reshaper=crop, verbose=False):
         success, img = reshaper(img, verbose=verbose)
         if success:
             x_train.append(img)
+            # if not type(labels) == pandas.DataFrame:
+            #     labels = dataset.labels
             y_train.append(get_label(img_name, dataset.labels))
     x_train = np.stack(x_train)
     amt = x_train.shape[0]
