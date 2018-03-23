@@ -14,11 +14,13 @@ from utils import utils
 
 Dataset = namedtuple(
     'Dataset',
-    ['train', 'test', 'labels', 'dict_index_to_label', 'dict_label_to_index'])
+    ['train', 'test', 'test_final', 'train_final', 'labels', 'dict_index_to_label', 'dict_label_to_index'])
 
 print(""" Dataset :: namedtuple(
     ['train' = ['img_name']
+    , 'train_final' = ['img_name']
     , 'test' = ['img_name']
+    , 'test_final' = ['img_name']
     , 'labels' = pandas.df('img_name','breed')
     , 'dict_index_to_label' = dict to convert label_index -> label_name
     , 'dict_label_to_index'= dict to convert label_name -> label_index
@@ -30,6 +32,8 @@ def init_dataset():
     labels = pandas.read_csv(config.dataset_dir + 'labels.csv')
     train = os.listdir(config.dataset_dir + 'train/')
     test = os.listdir(config.dataset_dir + 'test/')
+    test_final = os.listdir(config.dataset_dir + 'test_final/')
+    train_final = os.listdir(config.dataset_dir + 'train_final/')
 
     # create a label dicts to convert labels to numerical data and vice versa
     # the order is arbitrary, as long as we can convert them back to the original classnames
@@ -37,7 +41,7 @@ def init_dataset():
     dict_index_to_label_ = dict_index_to_label(unique_labels)
     dict_label_to_index_ = dict_label_to_index(unique_labels)
     # return data as a namedtuple
-    return Dataset(train, test, labels, dict_index_to_label_,
+    return Dataset(train, test, test_final, train_final, labels, dict_index_to_label_,
                    dict_label_to_index_)
 
 
