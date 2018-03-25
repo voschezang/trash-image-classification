@@ -13,6 +13,21 @@ denoising during training?
 denoising autoencoders
 
 
+
+minibatches nvidea
+
+layer: average of each x,y on a batch
+	create a 'plausible' reconstruction from that batch
+
+
+
+adverserial examples
+
+player 1 generates examples that will be misclassified by player2
+
+autoencoder
+	input-img -> encoder1 -> player2.predict() -> label /= real_label
+
 """
 shuffle existing images
   - use as negative examples
