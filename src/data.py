@@ -6,6 +6,7 @@ import keras.utils
 # from sklearn import svm
 # from skimage import data, io, filters
 from collections import namedtuple
+from scipy import misc, ndimage
 
 import config
 from utils import utils
@@ -14,14 +15,12 @@ from utils import utils
 
 Dataset = namedtuple(
     'Dataset',
-    ['train', 'test', 'test_final', 'train_final', 'labels', 'dict_index_to_label', 'dict_label_to_index'])
+    ['train', 'test', 'labels', 'dict_index_to_label', 'dict_label_to_index'])
 
 print(""" Dataset :: namedtuple(
     ['train' = ['img_name']
-    , 'train_final' = ['img_name']
     , 'test' = ['img_name']
-    , 'test_final' = ['img_name']
-    , 'labels' = pandas.df('img_name','breed')
+    , 'labels' = pandas.df('img_name','classification')
     , 'dict_index_to_label' = dict to convert label_index -> label_name
     , 'dict_label_to_index'= dict to convert label_name -> label_index
     """)
@@ -30,18 +29,19 @@ print(""" Dataset :: namedtuple(
 def init_dataset():
     # alt: use utils.Dataset
     labels = pandas.read_csv(config.dataset_dir + 'labels.csv')
+    print(labels['classification'])
     train = os.listdir(config.dataset_dir + 'train/')
     test = os.listdir(config.dataset_dir + 'test/')
-    test_final = os.listdir(config.dataset_dir + 'test_final/')
-    train_final = os.listdir(config.dataset_dir + 'train_final/')
+#     test_final = os.listdir(config.dataset_dir + 'test_final/')
+#     train_final = os.listdir(config.dataset_dir + 'train_final/')
 
     # create a label dicts to convert labels to numerical data and vice versa
     # the order is arbitrary, as long as we can convert them back to the original classnames
-    unique_labels = set(labels['breed'])
+    unique_labels = set(labels['classification'])
     dict_index_to_label_ = dict_index_to_label(unique_labels)
     dict_label_to_index_ = dict_label_to_index(unique_labels)
     # return data as a namedtuple
-    return Dataset(train, test, test_final, train_final, labels, dict_index_to_label_,
+    return Dataset(train, test, labels, dict_index_to_label_,
                    dict_label_to_index_)
 
 
@@ -86,16 +86,16 @@ def dict_label_to_index(labels):
 
 def get_label(img_name='aed285c5eae61e3e7ddb5f78e6a7a977.jpg',
               labels=pandas.DataFrame()):
-    # labels :: pandas.df :: { id: breed }
-    # index_dict :: { value: index } :: { breed: int }
-    label = labels.loc[labels['id'] == utils.stem(img_name)]
-    return label.breed.item()
+    # labels :: pandas.df :: { id: classification }
+    # index_dict :: { value: index } :: { classification: int }
+    label = labels.loc[labels['id'] == img_name]
+    return label.classification.item()
 
 
 # TODO rmv this function in svm-notebooks
 def filename_to_class(labels, filename='aed285c5eae61e3e7ddb5f78e6a7a977.jpg'):
-    # labels :: pandas.df :: { id: breed }
-    # index_dict :: { value: index } :: { breed: int }
+    # labels :: pandas.df :: { id: classification }
+    # index_dict :: { value: index } :: { classification: int }
     return get_label(filename, labels)
 
 
@@ -135,13 +135,17 @@ def extract_data(dataset, img_list, dimensions, verbose=False):
         img = read_img('train/', img_name, verbose)
         if img.shape == dimensions:
             img_data.append(img.flatten())
-            breed = filename_to_class(labels, img_name)
-            breed_index = dict_label_to_index[breed]
-            img_labels.append(breed_index)
+            classification = filename_to_class(labels, img_name)
+            classification_index = dict_label_to_index[classification]
+            img_labels.append(classification_index)
             # else: print('dims')
+  
     return (img_data, img_labels)
 
+def resize(image, dim1, dim2): 
+    return (True, misc.imresize(image, (dim1, dim2)))
 
+            
 def extract_all(dataset, img_list, reshaper=crop, verbose=False):
     # labels :: df['id','class']
     print('extract all data:', len(img_list))
@@ -151,7 +155,7 @@ def extract_all(dataset, img_list, reshaper=crop, verbose=False):
         if not img_name[-4:] == '.jpg':
             img_name += '.jpg'
         img = read_img('train/', img_name, verbose)
-        success, img = reshaper(img, verbose=verbose)
+        success, img = resize(img, 512, 348)
         if success:
             x_train.append(img)
             # if not type(labels) == pandas.DataFrame:
@@ -160,6 +164,25 @@ def extract_all(dataset, img_list, reshaper=crop, verbose=False):
     x_train = np.stack(x_train)
     amt = x_train.shape[0]
     return (x_train, y_train, amt)
+
+def extract_all_test(dataset, img_list, reshaper=crop, verbose=False):
+    # labels :: df['id','class']
+    print('extract all data:', len(img_list))
+    x_test = []
+    y_test = []
+    for img_name in img_list:
+        if not img_name[-4:] == '.jpg':
+            img_name += '.jpg'
+        img = read_img('test/', img_name, verbose)
+        success, img = reshaper(img, verbose=verbose)
+        if success:
+            x_test.append(img)
+            # if not type(labels) == pandas.DataFrame:
+            #     labels = dataset.labels
+            y_test.append(get_label(img_name, dataset.labels))
+    x_test = np.stack(x_test)
+    amt = x_test.shape[0]
+    return (x_test, y_test, amt)
 
 
 def items_with_label(labels, label='scottish_deerhound'):
@@ -171,8 +194,8 @@ def items_with_label(labels, label='scottish_deerhound'):
 
 def top_classes(labels, amt=3):
     # return classes that have the most instances
-    #:labels :: pandas.DataFrame['id','breed']
-    counter = collections.Counter(labels['breed'])
+    #:labels :: pandas.DataFrame['id','classification']
+    counter = collections.Counter(labels['classification'])
     ls = list(counter.items())
     sorted_list = sorted(ls, key=lambda x: x[1], reverse=True)[:amt]
     return [label for label, _ in sorted_list]
