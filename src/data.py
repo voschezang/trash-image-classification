@@ -15,11 +15,12 @@ from utils import utils
 
 Dataset = namedtuple(
     'Dataset',
-    ['train', 'test', 'labels', 'dict_index_to_label', 'dict_label_to_index'])
+    ['train', 'test', 'validation', 'labels', 'dict_index_to_label', 'dict_label_to_index'])
 
 print(""" Dataset :: namedtuple(
     ['train' = ['img_name']
     , 'test' = ['img_name']
+    , 'validation' = ['img_name']
     , 'labels' = pandas.df('img_name','classification')
     , 'dict_index_to_label' = dict to convert label_index -> label_name
     , 'dict_label_to_index'= dict to convert label_name -> label_index
@@ -32,6 +33,7 @@ def init_dataset():
     print(labels['classification'])
     train = os.listdir(config.dataset_dir + 'train/')
     test = os.listdir(config.dataset_dir + 'test/')
+    validation = os.listdir(config.dataset_dir + 'validation/')
 #     test_final = os.listdir(config.dataset_dir + 'test_final/')
 #     train_final = os.listdir(config.dataset_dir + 'train_final/')
 
@@ -41,18 +43,21 @@ def init_dataset():
     dict_index_to_label_ = dict_index_to_label(unique_labels)
     dict_label_to_index_ = dict_label_to_index(unique_labels)
     # return data as a namedtuple
-    return Dataset(train, test, labels, dict_index_to_label_,
+    return Dataset(train, test, validation, labels, dict_index_to_label_,
                    dict_label_to_index_)
 
 
-def labels_to_vectors(dataset, train_labels, test_labels):
+def labels_to_vectors(dataset, train_labels, test_labels, validation_labels):
     # dataset contains dicts to convert
     # TODO make sure that every label is present in both y_test and y_test
     train = textlabels_to_numerical(dataset, train_labels)
     test = textlabels_to_numerical(dataset, test_labels)
+    validation = textlabels_to_numerical(dataset, validation_labels)
     y_train = keras.utils.to_categorical(train)
     y_test = keras.utils.to_categorical(test)
-    return y_train, y_test
+    y_validation = keras.utils.to_categorical(validation)
+
+    return y_train, y_test, y_validation
 
 
 def y_to_label_dict(dataset, vector=[]):
@@ -155,7 +160,7 @@ def extract_all(dataset, img_list, reshaper=crop, verbose=False):
         if not img_name[-4:] == '.jpg':
             img_name += '.jpg'
         img = read_img('train/', img_name, verbose)
-        success, img = resize(img, 512, 348)
+        success, img = resize(img, 256, 256)
         if success:
             x_train.append(img)
             # if not type(labels) == pandas.DataFrame:
@@ -174,7 +179,7 @@ def extract_all_test(dataset, img_list, reshaper=crop, verbose=False):
         if not img_name[-4:] == '.jpg':
             img_name += '.jpg'
         img = read_img('test/', img_name, verbose)
-        success, img = reshaper(img, verbose=verbose)
+        success, img = resize(img, 256, 256)
         if success:
             x_test.append(img)
             # if not type(labels) == pandas.DataFrame:
@@ -184,6 +189,24 @@ def extract_all_test(dataset, img_list, reshaper=crop, verbose=False):
     amt = x_test.shape[0]
     return (x_test, y_test, amt)
 
+def extract_all_validation(dataset, img_list, reshaper=crop, verbose=False):
+    # labels :: df['id','class']
+    print('extract all data:', len(img_list))
+    x_validation = []
+    y_validation = []
+    for img_name in img_list:
+        if not img_name[-4:] == '.jpg':
+            img_name += '.jpg'
+        img = read_img('validation/', img_name, verbose)
+        success, img = resize(img, 256, 256)
+        if success:
+            x_validation.append(img)
+            # if not type(labels) == pandas.DataFrame:
+            #     labels = dataset.labels
+            y_validation.append(get_label(img_name, dataset.labels))
+    x_validation = np.stack(x_validation)
+    amt = x_validation.shape[0]
+    return (x_validation, y_validation, amt)
 
 def items_with_label(labels, label='scottish_deerhound'):
     # return all items with label x
