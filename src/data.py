@@ -178,7 +178,11 @@ def extract_all(dataset,
     return (x_train, y_train, amt)
 
 
-def extract_topx_classes(dataset, classes, train_or_test):
+def extract_topx_classes(dataset,
+                         classes,
+                         train_or_test,
+                         maxx=10,
+                         max_train=250):
     name_list = []
     n_per_class = []
     # tail = '.jpg'
@@ -186,7 +190,6 @@ def extract_topx_classes(dataset, classes, train_or_test):
         names = items_with_label(dataset.labels, cls)
         if train_or_test == 'train':
             train_names = [f for f in names if (f) in dataset.train]
-            max_train = 100  # 255 # hardcoded
             train_names = train_names[:max_train]
         if train_or_test == 'test':
             train_names = [f for f in names if (f) in dataset.test]
@@ -194,7 +197,7 @@ def extract_topx_classes(dataset, classes, train_or_test):
             train_names = [f for f in names if (f) in dataset.validation]
 
         max_train = 50  # 255 # hardcoded (2)
-        train_names = train_names[:max_train]
+        train_names = train_names[:maxx]
 
         name_list.append(train_names)
         n_per_class.append(len(train_names))
