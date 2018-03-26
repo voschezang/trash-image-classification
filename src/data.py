@@ -7,10 +7,10 @@ import keras.utils
 # from skimage import data, io, filters
 from collections import namedtuple
 from scipy import misc, ndimage
-
+from numpy import array
 import config
 from utils import utils
-
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 # from utils import utils # custom functions, in local environment
 
 Dataset = namedtuple(
@@ -46,6 +46,14 @@ def init_dataset():
     return Dataset(train, test, validation, labels, dict_index_to_label_,
                    dict_label_to_index_)
 
+def one_hot(values):
+    values = array(values)
+    label_encoder = LabelEncoder()
+    integer_encoded = label_encoder.fit_transform(values)
+    onehot_encoder = OneHotEncoder(sparse=False)
+    integer_encoded = integer_encoded.reshape(len(integer_encoded), 1)
+    onehot_encoded = onehot_encoder.fit_transform(integer_encoded)
+    return onehot_encoded
 
 def labels_to_vectors(dataset, train_labels, test_labels, validation_labels):
     # dataset contains dicts to convert
@@ -160,12 +168,9 @@ def extract_all(dataset, img_list, reshaper=crop, verbose=False):
         if not img_name[-4:] == '.jpg':
             img_name += '.jpg'
         img = read_img('train/', img_name, verbose)
-        success, img = resize(img, 256, 256)
-        if success:
-            x_train.append(img)
-            # if not type(labels) == pandas.DataFrame:
-            #     labels = dataset.labels
-            y_train.append(get_label(img_name, dataset.labels))
+        
+        x_train.append(img)
+        y_train.append(get_label(img_name, dataset.labels))
     x_train = np.stack(x_train)
     amt = x_train.shape[0]
     return (x_train, y_train, amt)
@@ -179,12 +184,8 @@ def extract_all_test(dataset, img_list, reshaper=crop, verbose=False):
         if not img_name[-4:] == '.jpg':
             img_name += '.jpg'
         img = read_img('test/', img_name, verbose)
-        success, img = resize(img, 256, 256)
-        if success:
-            x_test.append(img)
-            # if not type(labels) == pandas.DataFrame:
-            #     labels = dataset.labels
-            y_test.append(get_label(img_name, dataset.labels))
+        x_test.append(img)
+        y_test.append(get_label(img_name, dataset.labels))
     x_test = np.stack(x_test)
     amt = x_test.shape[0]
     return (x_test, y_test, amt)
@@ -198,12 +199,8 @@ def extract_all_validation(dataset, img_list, reshaper=crop, verbose=False):
         if not img_name[-4:] == '.jpg':
             img_name += '.jpg'
         img = read_img('validation/', img_name, verbose)
-        success, img = resize(img, 256, 256)
-        if success:
-            x_validation.append(img)
-            # if not type(labels) == pandas.DataFrame:
-            #     labels = dataset.labels
-            y_validation.append(get_label(img_name, dataset.labels))
+        x_validation.append(img)
+        y_validation.append(get_label(img_name, dataset.labels))
     x_validation = np.stack(x_validation)
     amt = x_validation.shape[0]
     return (x_validation, y_validation, amt)
