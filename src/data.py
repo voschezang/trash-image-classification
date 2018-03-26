@@ -1,6 +1,6 @@
 """ Functions that are specific to our dataset
 """
-import pandas, collections
+import pandas, collections, random
 import os, sklearn, skimage, skimage.io, pandas, numpy as np
 import keras.utils
 # from sklearn import svm
@@ -13,15 +13,16 @@ from utils import utils
 
 # from utils import utils # custom functions, in local environment
 
-Dataset = namedtuple(
-    'Dataset',
-    ['train', 'test', 'validation', 'labels', 'dict_index_to_label', 'dict_label_to_index'])
+Dataset = namedtuple('Dataset', [
+    'train', 'test', 'validation', 'labels', 'dict_index_to_label',
+    'dict_label_to_index'
+])
 
 print(""" Dataset :: namedtuple(
     ['train' = ['img_name']
     , 'test' = ['img_name']
     , 'validation' = ['img_name']
-    , 'labels' = pandas.df('img_name','classification')
+    , 'labels' = pandas.df('img_name','label')
     , 'dict_index_to_label' = dict to convert label_index -> label_name
     , 'dict_label_to_index'= dict to convert label_name -> label_index
     """)
@@ -30,12 +31,11 @@ print(""" Dataset :: namedtuple(
 def init_dataset():
     # alt: use utils.Dataset
     labels = pandas.read_csv(config.dataset_dir + 'labels.csv')
-    print(labels['classification'])
     train = os.listdir(config.dataset_dir + 'train/')
     test = os.listdir(config.dataset_dir + 'test/')
     validation = os.listdir(config.dataset_dir + 'validation/')
-#     test_final = os.listdir(config.dataset_dir + 'test_final/')
-#     train_final = os.listdir(config.dataset_dir + 'train_final/')
+    #     test_final = os.listdir(config.dataset_dir + 'test_final/')
+    #     train_final = os.listdir(config.dataset_dir + 'train_final/')
 
     # create a label dicts to convert labels to numerical data and vice versa
     # the order is arbitrary, as long as we can convert them back to the original classnames
@@ -144,14 +144,20 @@ def extract_data(dataset, img_list, dimensions, verbose=False):
             classification_index = dict_label_to_index[classification]
             img_labels.append(classification_index)
             # else: print('dims')
-  
+
     return (img_data, img_labels)
 
-def resize(image, dim1, dim2): 
-    return (True, misc.imresize(image, (dim1, dim2)))
 
-            
-def extract_all(dataset, img_list, reshaper=crop, verbose=False):
+def resize(image, dim1, dim2):
+    # return (True, misc.imresize(image, (dim1, dim2)))
+    return (True, skimage.transform.resize(image, (dim1, dim2)))
+
+
+def extract_all(dataset,
+                img_list,
+                reshaper=resize,
+                dirname='train/',
+                verbose=False):
     # labels :: df['id','class']
     print('extract all data:', len(img_list))
     x_train = []
@@ -159,54 +165,92 @@ def extract_all(dataset, img_list, reshaper=crop, verbose=False):
     for img_name in img_list:
         if not img_name[-4:] == '.jpg':
             img_name += '.jpg'
-        img = read_img('train/', img_name, verbose)
-        success, img = resize(img, 256, 256)
-        if success:
-            x_train.append(img)
-            # if not type(labels) == pandas.DataFrame:
-            #     labels = dataset.labels
-            y_train.append(get_label(img_name, dataset.labels))
+        img = read_img(dirname, img_name, verbose)
+        shape = (384, 512, 3)
+        if not img.shape == shape:
+            success, img = resize(img, shape[0], shape[1])
+        x_train.append(img)
+        # if not type(labels) == pandas.DataFrame:
+        #     labels = dataset.labels
+        y_train.append(get_label(img_name, dataset.labels))
     x_train = np.stack(x_train)
     amt = x_train.shape[0]
     return (x_train, y_train, amt)
 
-def extract_all_test(dataset, img_list, reshaper=crop, verbose=False):
-    # labels :: df['id','class']
-    print('extract all data:', len(img_list))
-    x_test = []
-    y_test = []
-    for img_name in img_list:
-        if not img_name[-4:] == '.jpg':
-            img_name += '.jpg'
-        img = read_img('test/', img_name, verbose)
-        success, img = resize(img, 256, 256)
-        if success:
-            x_test.append(img)
-            # if not type(labels) == pandas.DataFrame:
-            #     labels = dataset.labels
-            y_test.append(get_label(img_name, dataset.labels))
-    x_test = np.stack(x_test)
-    amt = x_test.shape[0]
-    return (x_test, y_test, amt)
 
-def extract_all_validation(dataset, img_list, reshaper=crop, verbose=False):
-    # labels :: df['id','class']
-    print('extract all data:', len(img_list))
-    x_validation = []
-    y_validation = []
-    for img_name in img_list:
-        if not img_name[-4:] == '.jpg':
-            img_name += '.jpg'
-        img = read_img('validation/', img_name, verbose)
-        success, img = resize(img, 256, 256)
-        if success:
-            x_validation.append(img)
-            # if not type(labels) == pandas.DataFrame:
-            #     labels = dataset.labels
-            y_validation.append(get_label(img_name, dataset.labels))
-    x_validation = np.stack(x_validation)
-    amt = x_validation.shape[0]
-    return (x_validation, y_validation, amt)
+def extract_topx_classes(dataset, classes, train_or_test):
+    name_list = []
+    n_per_class = []
+    # tail = '.jpg'
+    for cls in classes:
+        names = items_with_label(dataset.labels, cls)
+        if train_or_test == 'train':
+            train_names = [f for f in names if (f) in dataset.train]
+            max_train = 100  # 255 # hardcoded
+            train_names = train_names[:max_train]
+        if train_or_test == 'test':
+            train_names = [f for f in names if (f) in dataset.test]
+        if train_or_test == 'validation':
+            train_names = [f for f in names if (f) in dataset.validation]
+
+        max_train = 50  # 255 # hardcoded (2)
+        train_names = train_names[:max_train]
+
+        name_list.append(train_names)
+        n_per_class.append(len(train_names))
+    #         print('n_per_class',n_per_class)
+
+    n = min(n_per_class)
+    # (optional) reduce n to check whether the model can rember its input
+    # reduce train
+    #     reduced_n = 300
+    #         if n > reduced_n:    n = reduced_n
+    x = []
+    for ls in name_list:
+        for name in ls:
+            x.append(name)
+    random.shuffle(x)
+    return x, n
+
+
+# def extract_all_test(dataset, img_list, reshaper=crop, verbose=False):
+#     # labels :: df['id','class']
+#     print('extract all data:', len(img_list))
+#     x_test = []
+#     y_test = []
+#     for img_name in img_list:
+#         if not img_name[-4:] == '.jpg':
+#             img_name += '.jpg'
+#         img = read_img('test/', img_name, verbose)
+#         success, img = resize(img, 256, 256)
+#         if success:
+#             x_test.append(img)
+#             # if not type(labels) == pandas.DataFrame:
+#             #     labels = dataset.labels
+#             y_test.append(get_label(img_name, dataset.labels))
+#     x_test = np.stack(x_test)
+#     amt = x_test.shape[0]
+#     return (x_test, y_test, amt)
+
+# def extract_all_validation(dataset, img_list, reshaper=crop, verbose=False):
+#     # labels :: df['id','class']
+#     print('extract all data:', len(img_list))
+#     x_validation = []
+#     y_validation = []
+#     for img_name in img_list:
+#         if not img_name[-4:] == '.jpg':
+#             img_name += '.jpg'
+#         img = read_img('validation/', img_name, verbose)
+#         success, img = resize(img, 256, 256)
+#         if success:
+#             x_validation.append(img)
+#             # if not type(labels) == pandas.DataFrame:
+#             #     labels = dataset.labels
+#             y_validation.append(get_label(img_name, dataset.labels))
+#     x_validation = np.stack(x_validation)
+#     amt = x_validation.shape[0]
+#     return (x_validation, y_validation, amt)
+
 
 def items_with_label(labels, label='scottish_deerhound'):
     # return all items with label x
