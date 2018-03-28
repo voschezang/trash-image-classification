@@ -2,6 +2,7 @@
 """
 import pandas, collections, random
 import os, sklearn, skimage, skimage.io, pandas, numpy as np
+from collections import deque
 import keras.utils
 # from sklearn import svm
 # from skimage import data, io, filters
@@ -52,6 +53,7 @@ def init_dataset():
     return Dataset(train, test, validation, labels, dict_index_to_label_,
                    dict_label_to_index_)
 
+
 def one_hot(values):
     values = array(values)
     label_encoder = LabelEncoder()
@@ -60,6 +62,7 @@ def one_hot(values):
     integer_encoded = integer_encoded.reshape(len(integer_encoded), 1)
     onehot_encoded = onehot_encoder.fit_transform(integer_encoded)
     return onehot_encoded
+
 
 def labels_to_vectors(dataset, train_labels, test_labels, validation_labels):
     # dataset contains dicts to convert
@@ -174,31 +177,33 @@ def extract_all(dataset,
                 verbose=False):
     # labels :: df['id','class']
     print('extract all data:', len(img_list))
-#     x_train = []
-    from collections import deque
+    #     x_train = []
     y_train = []
-    x_train= []
+    x_train = []
     for img_name in img_list:
         if not img_name[-4:] == '.jpg':
             img_name += '.jpg'
-            
+
         img = read_img('train/', img_name, verbose)
         x = image.img_to_array(img)
-#         x = np.expand_dims(x, axis=0)
-        x = preprocess_input(x)       
+        #         x = np.expand_dims(x, axis=0)
+        x = preprocess_input(x)
         x_train.append(x)
 
-#         img = read_img(dirname, img_name, verbose)
-#         shape = (384, 512, 3)
-#         if not img.shape == shape:
-#             success, img = resize(img, shape[0], shape[1])
-#         x_train.append(img)
-        
+        #         img = read_img(dirname, img_name, verbose)
+        #         shape = (384, 512, 3)
+        #         if not img.shape == shape:
+        #             success, img = resize(img, shape[0], shape[1])
+        #         x_train.append(img)
+
         y_train.append(get_label(img_name, dataset.labels))
+
+
 #     x_train = np.stack(x_train)
     x_train = np.array(x_train)
     amt = x_train.shape[0]
     return (x_train, y_train, amt)
+
 
 def extract_all_test(dataset, img_list, reshaper=crop, verbose=False):
     # labels :: df['id','class']
@@ -215,6 +220,7 @@ def extract_all_test(dataset, img_list, reshaper=crop, verbose=False):
     amt = x_test.shape[0]
     return (x_test, y_test, amt)
 
+
 def extract_all_validation(dataset, img_list, reshaper=crop, verbose=False):
     # labels :: df['id','class']
     print('extract all data:', len(img_list))
@@ -229,6 +235,7 @@ def extract_all_validation(dataset, img_list, reshaper=crop, verbose=False):
     x_validation = np.stack(x_validation)
     amt = x_validation.shape[0]
     return (x_validation, y_validation, amt)
+
 
 def extract_topx_classes(dataset,
                          classes,
