@@ -2,6 +2,7 @@ results/*
 .idea/
 .ipynb_checkpoints/
 datasets/*
+models/*
 
 # Packages #
 ############
