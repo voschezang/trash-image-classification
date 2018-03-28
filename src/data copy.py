@@ -11,13 +11,8 @@ from numpy import array
 import config
 from utils import utils
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
-from keras.preprocessing.image import load_img
-from keras.preprocessing.image import img_to_array
-from keras.applications.vgg16 import preprocess_input
-from keras.applications.vgg16 import decode_predictions
-from keras.applications.vgg16 import VGG16
 # from utils import utils # custom functions, in local environment
-from keras.preprocessing import image
+from sklearn.decomposition import PCA
 
 Dataset = namedtuple('Dataset', [
     'train', 'test', 'validation', 'labels', 'dict_index_to_label',
@@ -108,6 +103,7 @@ def get_label(img_name='aed285c5eae61e3e7ddb5f78e6a7a977.jpg',
     # labels :: pandas.df :: { id: classification }
     # index_dict :: { value: index } :: { classification: int }
     label = labels.loc[labels['id'] == img_name]
+    print(label.classification.item())
     return label.classification.item()
 
 
@@ -125,7 +121,8 @@ def read_img(folder='train',
         folder += '/'
     filename = config.dataset_dir + folder + img_name
     if verbose: print('reading file: ' + filename)
-    return load_img(filename, target_size=(224, 224))
+
+    return skimage.io.imread(filename).mean(axis=2).flatten()
 
 
 def crop(img, size=250, verbose=False):
@@ -174,61 +171,54 @@ def extract_all(dataset,
                 verbose=False):
     # labels :: df['id','class']
     print('extract all data:', len(img_list))
-#     x_train = []
-    from collections import deque
+    x_train = []
     y_train = []
-    x_train= []
     for img_name in img_list:
         if not img_name[-4:] == '.jpg':
             img_name += '.jpg'
-            
-        img = read_img('train/', img_name, verbose)
-        x = image.img_to_array(img)
-#         x = np.expand_dims(x, axis=0)
-        x = preprocess_input(x)       
-        x_train.append(x)
-
-#         img = read_img(dirname, img_name, verbose)
+     
+        img = read_img(dirname, img_name, verbose)
+        
 #         shape = (384, 512, 3)
 #         if not img.shape == shape:
 #             success, img = resize(img, shape[0], shape[1])
-#         x_train.append(img)
-        
+        x_train.append(img)
         y_train.append(get_label(img_name, dataset.labels))
+        
+    x_train = np.array(x_train)       
 #     x_train = np.stack(x_train)
-    x_train = np.array(x_train)
     amt = x_train.shape[0]
     return (x_train, y_train, amt)
 
-def extract_all_test(dataset, img_list, reshaper=crop, verbose=False):
-    # labels :: df['id','class']
-    print('extract all data:', len(img_list))
-    x_test = []
-    y_test = []
-    for img_name in img_list:
-        if not img_name[-4:] == '.jpg':
-            img_name += '.jpg'
-        img = read_img('test/', img_name, verbose)
-        x_test.append(img)
-        y_test.append(get_label(img_name, dataset.labels))
-    x_test = np.stack(x_test)
-    amt = x_test.shape[0]
-    return (x_test, y_test, amt)
+# def extract_all_test(dataset, img_list, reshaper=crop, verbose=False):
+#     # labels :: df['id','class']
+#     print('extract all data:', len(img_list))
+#     x_test = []
+#     y_test = []
+#     for img_name in img_list:
+#         if not img_name[-4:] == '.jpg':
+#             img_name += '.jpg'
+#         img = read_img('test/', img_name, verbose)
+#         x_test.append(img)
+#         y_test.append(get_label(img_name, dataset.labels))
+#     x_test = np.stack(x_test)
+#     amt = x_test.shape[0]
+#     return (x_test, y_test, amt)
 
-def extract_all_validation(dataset, img_list, reshaper=crop, verbose=False):
-    # labels :: df['id','class']
-    print('extract all data:', len(img_list))
-    x_validation = []
-    y_validation = []
-    for img_name in img_list:
-        if not img_name[-4:] == '.jpg':
-            img_name += '.jpg'
-        img = read_img('validation/', img_name, verbose)
-        x_validation.append(img)
-        y_validation.append(get_label(img_name, dataset.labels))
-    x_validation = np.stack(x_validation)
-    amt = x_validation.shape[0]
-    return (x_validation, y_validation, amt)
+# def extract_all_validation(dataset, img_list, reshaper=crop, verbose=False):
+#     # labels :: df['id','class']
+#     print('extract all data:', len(img_list))
+#     x_validation = []
+#     y_validation = []
+#     for img_name in img_list:
+#         if not img_name[-4:] == '.jpg':
+#             img_name += '.jpg'
+#         img = read_img('validation/', img_name, verbose)
+#         x_validation.append(img)
+#         y_validation.append(get_label(img_name, dataset.labels))
+#     x_validation = np.stack(x_validation)
+#     amt = x_validation.shape[0]
+#     return (x_validation, y_validation, amt)
 
 def extract_topx_classes(dataset,
                          classes,
