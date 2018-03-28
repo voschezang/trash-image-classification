@@ -10,11 +10,14 @@ logs:
 dev:
 	python3 src/main.py
 
-install:
+deps:
 	pip3 install -r requirements.txt
 
-install2:
+deps2:
 	pip install -r requirements.txt
+
+install:
+	pip3 install -r requirements.txt
 
 clean:
 	find . -name \*.pyc -delete

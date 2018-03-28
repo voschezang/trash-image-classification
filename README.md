@@ -6,12 +6,12 @@ Install dependencies
 ```
 git clone https://github.com/voschezang/dog-breed-identification.git
 cd dog-breed-identification
-make install
+make deps start
 ```
 
-Or, if you do not have `pip3`
+Or, if you do not have `pip3` installed
 ```
-make install2
+make deps2 start
 ```
 
 
