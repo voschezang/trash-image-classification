@@ -17,3 +17,7 @@ plot_results_dir = 'results/'
 ###
 
 cascades_dir = '../haarcascades/'
+
+
+# Verbose modes
+result_ = True
