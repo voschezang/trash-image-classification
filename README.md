@@ -14,6 +14,10 @@ Or, if you do not have `pip3` installed
 make deps2 start
 ```
 
+Then navigate to the folder _nn_ and the file "_transfer learning_final.ipynb_"
+
+
+
 
 This repo does not include the dataset itself. Download the dataset from an external source [here](https://www.kaggle.com/c/dog-breed-identification/data) or [here](http://vision.stanford.edu/aditya86/ImageNetDogs/). Unzip all downloaded files and put them in a folder in the project root `datasets/`.
 
