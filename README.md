@@ -1,6 +1,9 @@
-# Dog Breed Identification
+# Classification of trash images
 
-Different approaches to solve this [kaggle](https://www.kaggle.com/c/dog-breed-identification) competition. Train and test data can be downloaded [here](http://vision.stanford.edu/aditya86/ImageNetDogs/) as well.
+This code expands upon the research paper "_Classification of Trash for Recyclability Status._" by Yang, M., and Thung, G. (2016). Available at: [link](https://cs229.stanford.edu/proj2016/report/ThungYang-ClassificationOfTrashForRecyclabilityStatus-report.pdf)
+Download the dataset [here](https://drive.google.com/drive/folders/0B3P9oO5A3RvSUW9qTG11Ul83TEE)
+
+## Setup
 
 Install dependencies 
 ```
@@ -17,14 +20,12 @@ make deps2 start
 Then navigate to the folder _nn_ and the file "_transfer learning_final.ipynb_"
 
 
-
-
-This repo does not include the dataset itself. Download the dataset from an external source [here](https://www.kaggle.com/c/dog-breed-identification/data) or [here](http://vision.stanford.edu/aditya86/ImageNetDogs/). Unzip all downloaded files and put them in a folder in the project root `datasets/`.
+###
 
 (The project should have the following structure)
 
 ```
-dog-breed-identification/
+image-classification/
   src/
     (jupyter notebooks)
     (some python scripts)
