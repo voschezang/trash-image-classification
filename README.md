@@ -7,8 +7,8 @@ Download the dataset [here](https://drive.google.com/drive/folders/0B3P9oO5A3RvS
 
 Install dependencies 
 ```
-git clone https://github.com/voschezang/dog-breed-identification.git
-cd dog-breed-identification
+git clone https://github.com/voschezang/trash-image-classification.git
+cd trash-image-classification
 make deps start
 ```
 
@@ -25,7 +25,7 @@ Then navigate to the folder _nn_ and the file "_transfer learning_final.ipynb_"
 (The project should have the following structure)
 
 ```
-image-classification/
+trash-image-classification/
   src/
     (jupyter notebooks)
     (some python scripts)
