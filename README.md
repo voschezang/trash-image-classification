@@ -1,7 +1,7 @@
 # Classification of trash images
 
-This code expands upon the research paper "_Classification of Trash for Recyclability Status._" by Yang, M., and Thung, G. (2016). Available at: [link](https://cs229.stanford.edu/proj2016/report/ThungYang-ClassificationOfTrashForRecyclabilityStatus-report.pdf)
-Download the dataset [here](https://drive.google.com/drive/folders/0B3P9oO5A3RvSUW9qTG11Ul83TEE)
+This code expands upon the research paper "_Classification of Trash for Recyclability Status._" by Yang, M., and Thung, G. (2016). The paper is available at: [link](https://cs229.stanford.edu/proj2016/report/ThungYang-ClassificationOfTrashForRecyclabilityStatus-report.pdf)
+Download the dataset [here](https://drive.google.com/drive/folders/0B3P9oO5A3RvSUW9qTG11Ul83TEE).
 
 ## Setup
 
