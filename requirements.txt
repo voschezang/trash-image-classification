@@ -1,5 +1,4 @@
 jupyter
-mlextend
 scipy
 numpy
 keras
